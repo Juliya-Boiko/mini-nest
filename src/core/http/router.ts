@@ -61,7 +61,7 @@ export function Factory(modules: any[]) {
 
           // Повний шлях = префікс + маршрут
           const path = prefix + r.path;
-
+          console.log(`🌀 [Router] Registering route: [${r.method.toUpperCase()}] ${path} -> ${Ctl.name}.${r.handlerName}`);
           // Підключаємо Express метод (get/post/put/...)
           (router as any)[r.method](
             path,
@@ -70,12 +70,12 @@ export function Factory(modules: any[]) {
             // Handler middleware для pipes / валідації
             asyncHandler(HandlerMiddleware(instance, handler, globalPipes)),
             // Filters middleware для обробки помилок
-            asyncHandler(FiltersMiddleware(Ctl, handler, globalFilters)),
+            // asyncHandler(FiltersMiddleware(Ctl, handler, globalFilters)),
           );
         });
       }
     }
-
+    app.use(FiltersMiddleware());
     // Запускаємо Express на порту
     app.listen(port, callback);
   }

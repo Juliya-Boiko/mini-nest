@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ArgumentMetadata, Type } from "../types";
 import { extractParams, get } from "../utils";
 import { runPipes } from "../decorators";
@@ -41,10 +41,19 @@ const getHandlerArgs = async (Ctl: Function, handler: Function, req: Request, gl
 
 // Middleware для виконання handler-а
 export const HandlerMiddleware = (instance: Type, handler: Function, globalPipes: Array<Type>) => {
-  return async (req: Request, res: Response) => {
-    const args = await getHandlerArgs(instance.constructor, handler, req, globalPipes);
+  // return async (req: Request, res: Response) => {
+  //   const args = await getHandlerArgs(instance.constructor, handler, req, globalPipes);
 
-    const result = await handler.apply(instance, args);
-    res.json(result);
-  }
+  //   const result = await handler.apply(instance, args);
+  //   res.json(result);
+  // }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const args = await getHandlerArgs(instance.constructor, handler, req, globalPipes);
+      const result = await handler.apply(instance, args);
+      res.json(result);
+    } catch (err) {
+      next(err); // ⚠ crucial: pass error to next middleware
+    }
+  };
 }

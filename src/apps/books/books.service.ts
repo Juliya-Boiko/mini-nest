@@ -1,5 +1,6 @@
 import { Injectable } from "../../core/decorators";
 import { LoggerService } from "../../core/providers/logger";
+import { HttpException } from "../../core/exceptions/http-exception";
 
 export interface Book { id: number; title: string; author: string }
 
@@ -16,7 +17,11 @@ export class BooksService {
 
   findOne(id: number) {
     this.logger.log(`Fetching book with id=${id}`);
-    return this.#data.find(b => b.id === id);
+    const book = this.#data.find(b => b.id === id)
+    if (!book) {
+      throw new HttpException(`Book with id=${id} not found`, 404);
+    }
+    return book;
   }
 
   create(title: string, author: string) {

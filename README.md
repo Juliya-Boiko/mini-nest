@@ -26,42 +26,40 @@ npm run dev # start dev server on http://localhost:8081/api/books
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ GuardsMiddleware            │
-      │ global → class → method    │
+      │ Controller pipes            │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ HandlerMiddleware           │
-      │ (wraps controller method)  │
+      │ Method pipes                │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ getHandlerArgs              │
-      │ (@Param, @Query, @Body)    │
+      │ Param pipes                 │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ runPipes                    │
-      │ global → class → method    │
+      │ Guard                       │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ Controller Method           │
-      │ (handler.apply)             │
+      │ Interceptor (before)        │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────────────────┐
-      │ FiltersMiddleware           │
-      │ (Exception handling)        │
+      │ Handler                     │
+      └─────────┬──────────────────┘
+                │
+                ▼
+      ┌─────────────────────────────┐
+      │ Interceptor (after)        │
       └─────────┬──────────────────┘
                 │
                 ▼
       ┌─────────────────┐
-      │ Express Response│
-      │ → Client        │
+      │ Filter          │
       └─────────────────┘
