@@ -14,7 +14,7 @@ export interface ExecutionContext {
   };
 }
 
-/** Реалізація для Express-раутів */
+/** Реалізація для Express-рoутів */
 export class ExpressExecutionContext implements ExecutionContext {
   constructor(
     private readonly targetClass: Function,

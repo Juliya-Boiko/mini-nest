@@ -7,6 +7,9 @@ export const ROLES_KEY = 'roles';
 export const Roles = (...roles: string[]) =>
   SetMetadata(ROLES_KEY, roles);
 
+
+// Admin-role guard
+// admin → 200 OK
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) { }
