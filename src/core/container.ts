@@ -1,47 +1,72 @@
 // Reflect.getMetadata, щоб отримувати типи параметрів конструктора
 import 'reflect-metadata';
+import { INJECT_METADATA_KEY } from './decorators/inject';
+
+type Token = string | symbol | Function;
 
 export class Container {
-  // Зареєстровані класи (token → клас)
-  #registered = new Map();
-  // Інстанси singleton (token → instance)
-  #singletons = new Map();
+  // token → клас (provider)
+  #registered = new Map<Token, any>();
 
-  // resolve(token) — отримати інстанс класу
-  resolve<T>(token: new (...args: any[]) => T): T {
-    // Якщо singleton вже створений, повертаємо його
-    if (this.#singletons.has(token)) return this.#singletons.get(token);
+  // token → singleton instance
+  #singletons = new Map<Token, any>();
 
-    // Отримуємо клас з реєстрації
-    const cs = this.#registered.get(token);
-    if (!cs) {
-      throw new Error(`Token ${token.name} is not registered.`);
+  /**
+   * Отримання інстансу по токену
+   */
+  resolve<T>(token: Token): T {
+    // 1️⃣ Якщо singleton вже існує — повертаємо
+    if (this.#singletons.has(token)) {
+      return this.#singletons.get(token);
     }
 
-    // Отримуємо metadata про типи параметрів конструктора
-    const deps: any[] = Reflect.getMetadata("design:paramtypes", token) || [];
+    // 2️⃣ Отримуємо клас-провайдер
+    const target = this.#registered.get(token);
 
-    const resolved = new cs(...deps.map(d => {
-      if (d === token) {
-        throw new Error(`Circular dependency detected for token ${token.name}.`);
+    if (!target) {
+      throw new Error(`Token ${String(token)} is not registered.`);
+    }
+
+    // 3️⃣ Отримуємо типи параметрів конструктора
+    const paramTypes: any[] =
+      Reflect.getMetadata('design:paramtypes', target) || [];
+
+    // 4️⃣ Отримуємо кастомні токени з @Inject()
+    const injectTokens =
+      Reflect.getMetadata(INJECT_METADATA_KEY, target) || {};
+
+    // 5️⃣ Резолв залежностей
+    const dependencies = paramTypes.map((paramType, index) => {
+      const customToken = injectTokens[index];
+      const dependencyToken = customToken || paramType;
+
+      if (dependencyToken === token) {
+        throw new Error(
+          `Circular dependency detected for token ${String(token)}`
+        );
       }
 
-      return this.resolve(d)
-    }));
+      return this.resolve(dependencyToken);
+    });
 
-    // Зберігаємо singleton
-    this.#singletons.set(token, resolved);
-    return resolved;
+    // 6️⃣ Створюємо інстанс
+    const instance = new target(...dependencies);
+
+    // 7️⃣ Зберігаємо як singleton
+    this.#singletons.set(token, instance);
+
+    return instance;
   }
 
-  // Реєстрація класу в контейнері
-  register<T extends Function>(token: T, member: T): void {
-    // Перевірка на дублікати
+  /**
+   * Реєстрація провайдера
+   */
+  register(token: Token, provider: any): void {
     if (this.#registered.has(token)) {
-      throw new Error(`Token ${token.name} is already registered.`);
+      throw new Error(`Token ${String(token)} is already registered.`);
     }
 
-    this.#registered.set(token, member);
+    this.#registered.set(token, provider);
   }
 }
 

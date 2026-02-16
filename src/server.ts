@@ -19,18 +19,18 @@ process.on('uncaughtException', (err) => {
 
 try {
   // 1️⃣ Перевірка singleton LoggerService
-  const logger1 = container.resolve(LoggerService);
-  const logger2 = container.resolve(LoggerService);
-  console.log("💬 LoggerService singleton?", logger1 === logger2);
+  // const logger1 = container.resolve(LoggerService);
+  // const logger2 = container.resolve(LoggerService);
+  // console.log("💬 LoggerService singleton?", logger1 === logger2);
 
   // 2️⃣ Перевірка singleton BooksService + транзитивна залежність LoggerService
-  const books1 = container.resolve(BooksService);
-  const books2 = container.resolve(BooksService);
-  console.log("💬 BooksService singleton?", books1 === books2);
-  console.log("💬 Logger injected in BooksService?", books1["logger"] === logger1);
+  // const books1 = container.resolve(BooksService);
+  // const books2 = container.resolve(BooksService);
+  // console.log("💬 BooksService singleton?", books1 === books2);
+  // console.log("💬 Logger injected in BooksService?", books1["logger"] === logger1);
 
   // 3️⃣ Пробний виклик метода сервісу
-  console.log("💬 BooksService.findAll() test:", books1.findAll());
+  // console.log("💬 BooksService.findAll() test:", books1.findAll());
 
 } catch (err) {
   console.error("DI Container test failed:", err);
