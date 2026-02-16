@@ -5,9 +5,12 @@ import { runPipes } from "../decorators";
 
 // Кастомна помилка для pipe
 class PipeError extends Error {
-  constructor(message: string) {
+  status: number;
+
+  constructor(message: string, status = 400) {
     super(message);
     this.name = "PipeError";
+    this.status = status;
   }
 }
 
@@ -32,7 +35,10 @@ const getHandlerArgs = async (Ctl: Function, handler: Function, req: Request, gl
       // Пропускаємо через pipes (transform, validation)
       args[metadata.index] = await runPipes(Ctl, handler, argument, metadata, globalPipes);
     } catch (error: any) {
-      throw new PipeError(`Pipe error for: ${error.message}`);
+      throw new PipeError(
+        `Pipe error for: ${error.message}`,
+        error.status ?? 400
+      );
     }
   }
 
