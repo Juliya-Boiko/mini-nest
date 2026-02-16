@@ -43,6 +43,10 @@ export async function runPipes(
 ) {
   const pipes = getPipes(handler, controllerCls, globalPipes);
 
+  if (meta.pipes && meta.pipes.length) {
+    pipes.push(...meta.pipes);
+  }
+
   let transformed = value;
 
   for (const PipeCtor of pipes) {
