@@ -63,7 +63,7 @@ export class Container {
    */
   register(token: Token, provider: any): void {
     if (this.#registered.has(token)) {
-      throw new Error(`Token ${String(token)} is already registered.`);
+      return; // просто ігноруємо повторну реєстрацію
     }
 
     this.#registered.set(token, provider);
