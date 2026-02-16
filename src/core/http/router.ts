@@ -65,10 +65,10 @@ export function Factory(modules: any[]) {
           // Підключаємо Express метод (get/post/put/...)
           (router as any)[r.method](
             path,
-            // Guards middleware обертає handler
-            asyncHandler(GuardsMiddleware(Ctl, handler, globalGuards)),
             // Handler middleware для pipes / валідації
             asyncHandler(HandlerMiddleware(instance, handler, globalPipes)),
+            // Guards middleware обертає handler
+            asyncHandler(GuardsMiddleware(Ctl, handler, globalGuards)),
             // Filters middleware для обробки помилок
             // asyncHandler(FiltersMiddleware(Ctl, handler, globalFilters)),
           );

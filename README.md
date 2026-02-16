@@ -9,7 +9,7 @@ npm install
 ```
 
 ```bash
-npm run dev # start dev server on http://localhost:8081/api/books
+npm run dev # start dev server on http://localhost:8081/books
 ```
 
 
